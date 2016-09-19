@@ -1,0 +1,4 @@
+<RCC>
+    <qresource prefix="BatteryQuery">
+    </qresource>
+</RCC>
