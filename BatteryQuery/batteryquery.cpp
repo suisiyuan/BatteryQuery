@@ -151,12 +151,12 @@ void BatteryQuery::handleSocketStateChanged(QAbstractSocket::SocketState state)
 			file = new QFile(QString("./") + QDateTime::currentDateTime().toString(QStringLiteral("yyyy年MM月dd日 hh时mm分ss秒")) + QString(".txt"));
 			file->open(QIODevice::WriteOnly | QIODevice::Append);
 			file->write(ui.statusBar->currentMessage().append("\n").toUtf8());
-			file->write(QStringLiteral("时间（min）\t电压（V）").append("\n").toUtf8());
+			file->write(QStringLiteral("时间\t\t\t  电压\n").toUtf8());
 			file->close();
 			times = 0;
 			sendQueryMsg();
 
-			timer->start(TIMER_INTERVAL);
+			timer->start(1000 * 60 * 5);
 			
 			break;
 		}
@@ -180,13 +180,12 @@ void BatteryQuery::handleDataReceived()
 	switch ((quint8)data.at(2))
 	{
 		case BATTERY_RSP:
-			qDebug() << times << (double)data.at(3) / 100 + YAXIS_LOWER;
 			if (times * TIME_IN_MINUTE > ui.customPlot->xAxis->range().upper)
 				ui.customPlot->xAxis->setRange(0, ui.customPlot->xAxis->range().upper + XAXIS_INCREMENT);
 			ui.customPlot->graph()->addData(times * TIME_IN_MINUTE, (double)data.at(3)/100 + YAXIS_LOWER);
 			ui.customPlot->replot();
 			file->open(QIODevice::WriteOnly | QIODevice::Append);
-			file->write(QString::number(times * TIME_IN_MINUTE).append("\t\t\t").append(QString::number((double)data.at(3) / 100 + YAXIS_LOWER, 'g', 3)).append("\n").toUtf8());
+			file->write(QDateTime::currentDateTime().toString("hh:mm:ss").append("\t\t").append(QString::number((double)data.at(3) / 100 + YAXIS_LOWER, 'g', 3)).append("\n").toUtf8());
 			file->close();
 			times++;
 			break;		

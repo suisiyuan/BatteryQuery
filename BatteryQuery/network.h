@@ -4,9 +4,7 @@
 #define SERVER_TCP_PORT	20108
 #define WAITING_TIME	1000
 
-#define TIME_RATIO		(60*1000)
 #define TIME_IN_MINUTE	5
-#define TIMER_INTERVAL	(TIME_IN_MINUTE * TIME_RATIO)
 
 
 #define ACK_MASK		(1 << 7)
