@@ -126,8 +126,6 @@ void BatteryQuery::handleSocketStateChanged(QAbstractSocket::SocketState state)
 			timer->stop();
 			ui.connectButton->setEnabled(true);
 			ui.disconnectButton->setDisabled(true);
-		
-			file->close();
 
 			break;
 		}
@@ -151,10 +149,10 @@ void BatteryQuery::handleSocketStateChanged(QAbstractSocket::SocketState state)
 				delete file;
 
 			file = new QFile(QString("./") + QDateTime::currentDateTime().toString(QStringLiteral("yyyy年MM月dd日 hh时mm分ss秒")) + QString(".txt"));
-			file->open(QIODevice::WriteOnly);
+			file->open(QIODevice::WriteOnly | QIODevice::Append);
 			file->write(ui.statusBar->currentMessage().append("\n").toUtf8());
 			file->write(QStringLiteral("时间（min）\t电压（V）").append("\n").toUtf8());
-
+			file->close();
 			times = 0;
 			sendQueryMsg();
 
@@ -187,8 +185,9 @@ void BatteryQuery::handleDataReceived()
 				ui.customPlot->xAxis->setRange(0, ui.customPlot->xAxis->range().upper + XAXIS_INCREMENT);
 			ui.customPlot->graph()->addData(times * TIME_IN_MINUTE, (double)data.at(3)/100 + YAXIS_LOWER);
 			ui.customPlot->replot();
-
+			file->open(QIODevice::WriteOnly | QIODevice::Append);
 			file->write(QString::number(times * TIME_IN_MINUTE).append("\t\t\t").append(QString::number((double)data.at(3) / 100 + YAXIS_LOWER, 'g', 3)).append("\n").toUtf8());
+			file->close();
 			times++;
 			break;		
 		default:
